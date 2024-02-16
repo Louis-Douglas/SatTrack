@@ -1,21 +1,16 @@
 // SatTrack
 
 using System;
-using System.Collections;
+
 using System.Collections.Generic;
-using System.Xml.Linq;
-using SGPdotNET.CoordinateSystem;
+
 using SGPdotNET.Exception;
-using SGPdotNET.Observation;
-using SGPdotNET.TLE;
+
 using UnityEngine;
 using System.Threading.Tasks;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
-using UnityEngine.EventSystems;
-using UnityEngine.Rendering.PostProcessing;
-using System.Reflection.Emit;
-using System.Threading;
+
+//using System.Threading;
 
 public class TleMapper : MonoBehaviour
 {
@@ -96,14 +91,14 @@ public class TleMapper : MonoBehaviour
         lastCheckedTime = simulatedTime;
         previousSatellitesToProcess = 0;
 
-        cpuThreads = SystemInfo.processorCount/2;
+        cpuThreads = Mathf.Max(SystemInfo.processorCount/2, 1);
 
         // Logging
         Debug.Log("Initiallised in " + (DateTime.Now - startBootup) + " seconds");
         
     }
 
-
+    int processCooldown = 0;
     void FixedUpdate()
     {
         simulatedTime = simulatedTime.AddSeconds(speed * Time.deltaTime);
@@ -155,40 +150,25 @@ public class TleMapper : MonoBehaviour
             selectedSatellite.RenderOrbitPath();
         }
 
-        // Split processing between 1/2 number of threads the computer has
-        int remainder = satellitesToProcess.Count % cpuThreads;
-        int start = 0;
-        int incrementAmount = Mathf.FloorToInt(satellitesToProcess.Count / cpuThreads);
-        int end = incrementAmount;
 
-        List<Thread> threads = new List<Thread>();
+        // Reduce frequency of satellite processing dependent on number of satellites and speed
+        int cooldownAmount = Mathf.Max(Mathf.Min(satellitesToProcess.Count / 50, 200), 5);
 
-
-        for (int i = 0; i < cpuThreads; i++)
+        if (Mathf.Abs(speed) == 200)
         {
-
-            List<Satellite> threadSatellites = new List<Satellite>();
-            for (int j = start; j < end; j++)
-            {
-                threadSatellites.Add(satellitesToProcess[j]);
-            }
-
-            start = end;
-            end += incrementAmount;
-            if (i == cpuThreads - 2)
-            {
-                end += remainder;
-                
-            }
-
-            Thread thread = new Thread(() => ProcessSatellites(threadSatellites));
-            threads.Add(thread);
+            cooldownAmount = Mathf.Min(cooldownAmount / 4, 5);
         }
 
-        foreach (Thread thread in threads)
+        if (processCooldown >= cooldownAmount)
         {
-            thread.Start();
+            processCooldown = 0;
+        } else
+        {
+            processCooldown++;
+            return;
         }
+
+        ProcessSatellites(satellitesToProcess);
 
         // Any errors caught while processing will add a satellite to the destroy list
         foreach (Satellite satellite in destroyList)

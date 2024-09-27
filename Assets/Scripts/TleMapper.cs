@@ -27,6 +27,9 @@ public class TleMapper : MonoBehaviour
     public GameObject satellitePathLine;
     public GameObject satellitePathSlider;
 
+    public GameObject minScreenIcon;
+    public GameObject maxScreenIcon;
+
     public float lineTolerance = 0.1f;
 
     public int speed = 1;
@@ -246,7 +249,15 @@ public class TleMapper : MonoBehaviour
         // Clearing selected satellite info
         if (Input.GetKeyDown(KeyCode.Escape) && selectedSatellite != null)
         {
-            selectedSatellite.Deselect();
+            if (Screen.fullScreen)
+            {
+                minScreenIcon.SetActive(false);
+                maxScreenIcon.SetActive(true);
+            } else
+            {
+                selectedSatellite.Deselect();
+            }
+                
         }
     }
 
@@ -384,6 +395,23 @@ public class TleMapper : MonoBehaviour
     public void ToggleSatelliteInfoSlider(bool active)
     {
         satellitePathSlider.SetActive(active);
+    }
+
+    public void SetFullScreen(bool fullScreen)
+    {
+        
+        Screen.fullScreen = fullScreen;
+        if (fullScreen)
+        {
+            //Screen.SetResolution(Screen.width, Screen.height, true);
+            minScreenIcon.active = true;
+            maxScreenIcon.active = false;
+        } else
+        {
+            minScreenIcon.active = false;
+            maxScreenIcon.active = true;
+        }
+
     }
 
 }

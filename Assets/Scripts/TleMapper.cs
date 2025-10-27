@@ -247,13 +247,13 @@ public class TleMapper : MonoBehaviour
     private void Update()
     {
         // Clearing selected satellite info
-        if (Input.GetKeyDown(KeyCode.Escape) && selectedSatellite != null)
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (Screen.fullScreen)
             {
                 minScreenIcon.SetActive(false);
                 maxScreenIcon.SetActive(true);
-            } else
+            } else if (selectedSatellite != null)
             {
                 selectedSatellite.Deselect();
             }

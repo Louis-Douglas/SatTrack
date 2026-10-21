@@ -63,6 +63,8 @@ crashlytics-build.properties
 # bin
 /bin
 
+.idea/
+
 #MacOS
 .DS_Store
 ._.DS_Store

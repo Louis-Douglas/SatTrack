@@ -404,12 +404,12 @@ public class TleMapper : MonoBehaviour
         if (fullScreen)
         {
             //Screen.SetResolution(Screen.width, Screen.height, true);
-            minScreenIcon.active = true;
-            maxScreenIcon.active = false;
+            minScreenIcon.SetActive(true);
+            maxScreenIcon.SetActive(false);
         } else
         {
-            minScreenIcon.active = false;
-            maxScreenIcon.active = true;
+            minScreenIcon.SetActive(false);
+            minScreenIcon.SetActive(true);
         }
 
     }

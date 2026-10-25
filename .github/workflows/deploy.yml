@@ -49,7 +49,6 @@ jobs:
             starlink
             oneweb
             stations
-            last-30-days
             molniya
             active
           )

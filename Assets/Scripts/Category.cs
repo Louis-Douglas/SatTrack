@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using SGPdotNET.Exception;
-using SGPdotNET.Observation;
 using SGPdotNET.TLE;
 using UnityEngine;
 using System.Threading.Tasks;
+using System.Linq;
+using UnityEngine.Networking;
 
 public class Category
 {
@@ -29,10 +30,29 @@ public class Category
         this.label = label;
         isActive = false;
 
-        Uri uri = new Uri(TleBaseUrl + file);
-        RemoteTleProvider provider = new RemoteTleProvider(true, uri);
+        string url = TleBaseUrl + file;
 
-        Dictionary<int, Tle> tles = await provider.GetTlesAsync();
+        Dictionary<int, Tle> tles;
+
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            await SendRequestAsync(request);
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                throw new Exception($"Failed to download TLEs from {url}: {request.error}");
+            }
+
+            string tleText = request.downloadHandler.text;
+
+            tles = Tle.ParseElements(
+                tleText.Replace("\r\n", "\n")
+                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries),
+                true
+            ).ToDictionary(tle => (int)tle.NoradNumber);
+
+            Debug.Log($"Loaded {tles.Count} TLEs from {file}");
+        }
 
         foreach (Tle tle in tles.Values)
         {
@@ -96,6 +116,16 @@ public class Category
         SetActive(isActive);
 
         Initiated = true;
+    }
+    
+    private static async Task SendRequestAsync(UnityWebRequest request)
+    {
+        UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+
+        while (!operation.isDone)
+        {
+            await Task.Yield();
+        }
     }
 
     public HashSet<uint> GetSatellites()

@@ -156,12 +156,12 @@ public class TleMapper : MonoBehaviour
 
         // Reduce frequency of satellite processing dependent on number of satellites and speed
         int cooldownAmount = Mathf.Max(Mathf.Min(satellitesToProcess.Count / 50, 200), 5);
-
+        
         if (Mathf.Abs(speed) == 200)
         {
             cooldownAmount = Mathf.Min(cooldownAmount / 4, 5);
         }
-
+        
         if (processCooldown >= cooldownAmount)
         {
             processCooldown = 0;
@@ -193,23 +193,21 @@ public class TleMapper : MonoBehaviour
     // Add new categories here with 2 lines of code
     private Task<List<Category>> LoadSatellites()
     {
-        List<Category> loadingCategories = new List<Category>();
-        Category weather = new Category("https://celestrak.com/NORAD/elements/weather.txt", "Weather");
-        Category geosynchronous = new Category("https://celestrak.org/NORAD/elements/gp.php?GROUP=geo&FORMAT=tle", "Geosynchronous");
-        Category starlink = new Category("https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle", "Starlink");
-        Category oneWeb = new Category("https://celestrak.org/NORAD/elements/gp.php?GROUP=oneweb&FORMAT=tle", "OneWeb");
-        Category spaceStations = new Category("https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle", "Space Stations");
-        Category last30Days = new Category("https://celestrak.org/NORAD/elements/gp.php?GROUP=last-30-days&FORMAT=tle", "Last 30 Days");
-        Category molniya = new Category("https://celestrak.org/NORAD/elements/gp.php?GROUP=molniya&FORMAT=tle", "Molniya");
-        Category active = new Category("https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle", "Active");
 
+        List<Category> loadingCategories = new List<Category>();
+        
+        Category weather = new Category("weather.txt", "Weather");
+        Category geosynchronous = new Category("geo.txt", "Geosynchronous");
+        Category starlink = new Category("starlink.txt", "Starlink");
+        Category oneWeb = new Category("oneweb.txt", "OneWeb");
+        Category spaceStations = new Category("stations.txt", "Space Stations");
+        Category active = new Category("active.txt", "Active");
+        
         loadingCategories.Add(weather);
         loadingCategories.Add(geosynchronous);
         loadingCategories.Add(starlink);
         loadingCategories.Add(oneWeb);
         loadingCategories.Add(spaceStations);
-        loadingCategories.Add(last30Days);
-        loadingCategories.Add(molniya);
         loadingCategories.Add(active);
 
         foreach (Category category in loadingCategories)

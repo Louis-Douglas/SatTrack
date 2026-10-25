@@ -12,22 +12,24 @@ public class Category
     private String label;
     private TleMapper tleMapper = TleMapper.Instance;
     private bool isActive;
+    private const string TleBaseUrl =
+        "https://sattrack.louisdouglas.com/TLE/";
 
     public bool Initiated { get; protected set; }
 
-    public Category(String url, String label)
+    public Category(String file, String label)
     {
-        Initialize = CreateInstanceAsync(url, label);
+        Initialize = CreateInstanceAsync(file, label);
     }
 
     public Task Initialize { get; }
 
-    private async Task CreateInstanceAsync(String url, String label)
+    private async Task CreateInstanceAsync(String file, String label)
     {
         this.label = label;
         isActive = false;
 
-        Uri uri = new Uri(url);
+        Uri uri = new Uri(TleBaseUrl + file);
         RemoteTleProvider provider = new RemoteTleProvider(true, uri);
 
         Dictionary<int, Tle> tles = await provider.GetTlesAsync();
